@@ -6,14 +6,10 @@
   <% @reviews.each do |review| %>
     <li>
       <span class="review"><%= pluralize(review.stars, 'star') %></span>
-      <span class="user">by <%= review.name %></span>
+      <span class="user">by <%= link_to review.user.username, review.user %></span>
       <span class="date"><%= time_ago_in_words(review.created_at) %> ago</span>
       <p>
         &quot;<%= review.comment %>&quot;
-      </p>
-      <p>
-        <%= link_to 'edit', edit_movie_review_path(@movie, review) %> | 
-        <%= link_to 'delete', [@movie, review], method: :delete, data: { confirm: 'Are you sure?' } %>
       </p>
     </li>
   <% end %>

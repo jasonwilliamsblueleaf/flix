@@ -128,7 +128,7 @@ aside#sidebar {
         padding: 4px 0;
         padding-left: 25px;
 
-        &.all-movies a {
+        &.movies a {
           display: block;
           background: image-url("arrow.png") no-repeat 10px 8px;
           padding-left: 35px;
@@ -142,6 +142,11 @@ aside#sidebar {
 
         a:hover {
           background-color: $accent-color;
+          color: #000;
+        }
+
+        a.active {
+          background-color: $subdued-color;
           color: #000;
         }
 

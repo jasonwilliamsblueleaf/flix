@@ -1,3 +1,5 @@
+<% content_for(:title, "#{@movie.title} (#{@movie.released_on.year})") %>
+
 <article id="movie" class="movie">
   <header>
     <%= image_for(@movie) %>
@@ -12,7 +14,24 @@
   <h3 class="no-rule">
     <%= @movie.rating %> &bull; <%= @movie.duration %> 
   </h3>
-  
+
+  <% if current_user %>
+    <% if @current_fan %>
+      <p>
+        <%= button_to 'Unfave', movie_favorite_path(@movie, @current_fan), method: :delete, 
+                        class: "button unfave" %>
+      </p>
+    <% else %>
+      <p>
+        <%= button_to 'Fave', movie_favorites_path(@movie), class: "button fave" %>
+      </p>
+    <% end %>
+  <% end %>
+
+  <p>
+    <%= pluralize(@fans.size, 'fan') %>
+  </p>
+
   <h3>Cast</h3>
   <p>
     <%= @movie.cast %>
@@ -39,7 +58,7 @@
       <% @movie.recent_reviews.each do |r| %>
         <li>
           &quot;<%= r.comment %>&quot; <br>
-          - <strong><%= r.name %></strong>
+          - <strong><%= r.user.username %></strong>
         </li>
       <% end %>
     </ol>
@@ -53,10 +72,34 @@
       <p>
         <%= link_to 'Write Review', new_movie_review_path(@movie), class: 'button ok review' %><br>
       </p>
-      <%= link_to 'Edit', edit_movie_path(@movie), class: 'button' %>
-      <%= link_to 'Delete', @movie, 
-                  class: 'button',
-                  method: :delete, data: { confirm: 'Are you sure?' } %>
+      <% if current_user_admin? %>
+        <%= link_to 'Edit', edit_movie_path(@movie), class: 'button' %>
+        <%= link_to 'Delete', @movie, 
+                    class: 'button',
+                    method: :delete, data: { confirm: 'Are you sure?' } %>
+      <% end %>
     </nav>
   </footer>
 </article>
+
+<% content_for(:side) do %>
+  <% if @fans.any? %>
+    <h3>Fans</h3>
+    <ul>
+      <% @fans.each do |user| %>
+        <li>
+          <%= link_to user.username, user %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <h3>Genres</h3>
+  <ul>
+    <% @genres.each do |genre| %>
+      <li>
+        <%= genre.name %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

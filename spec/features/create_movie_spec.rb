@@ -1,44 +1,60 @@
 require 'rails_helper'
 
+
+
 describe "Creating a new movie" do
-  it "saves the movie and shows the new movie's details" do
-    visit movies_url
 
-    click_link 'Add New Movie'
+    before do
+        admin = User.create!(user_attributes(admin: true))
+        sign_in(admin)
+        @genre1 = Genre.create!(name: "Genre 1")
+        @genre2 = Genre.create!(name: "Genre 2")
+        @genre3 = Genre.create!(name: "Genre 3")
+    end
 
-    expect(current_path).to eq(new_movie_path)
+    it "saves the movie and shows the new movie's details" do
+        visit movies_url
 
-    fill_in "Title", with: "New Movie Title"
-    fill_in "Description", with: "Superheroes saving the world from villains"
-    select "PG-13", :from => "movie_rating"
-    fill_in "Total gross", with: "75000000"
-    select (Time.now.year - 1).to_s, :from => "movie_released_on_1i"
-    fill_in "Cast", with: "The award-winning cast"
-    fill_in "Director", with: "The ever-creative director"
-    fill_in "Duration", with: "123 min"
-    fill_in "Image file name", with: "movie.png"
-    
-    # If you're taking advantage of the HTML 5 date field in Chrome,
-    # you'll need to use 'fill_in' rather than 'select'
-    # fill_in "Released on", with: (Time.now.year - 1).to_s
+        click_link 'Add New Movie'
 
-    click_button 'Create Movie'
+        expect(current_path).to eq(new_movie_path)
 
-    expect(current_path).to eq(movie_path(Movie.last))
+        fill_in "Title", with: "New Movie Title"
+        fill_in "Description", with: "Superheroes saving the world from villains"
+        select "PG-13", :from => "movie_rating"
+        fill_in "Total gross", with: "75000000"
+        select (Time.now.year - 1).to_s, :from => "movie_released_on_1i"
+        fill_in "Cast", with: "The award-winning cast"
+        fill_in "Director", with: "The ever-creative director"
+        fill_in "Duration", with: "123 min"
+        fill_in "Image file name", with: "movie.png"
+        check(@genre1.name)
+        check(@genre2.name)
 
-    expect(page).to have_text('New Movie Title')
+        # If you're taking advantage of the HTML 5 date field in Chrome,
+        # you'll need to use 'fill_in' rather than 'select'
+        # fill_in "Released on", with: (Time.now.year - 1).to_s
 
-    expect(page).to have_text('Movie was successfully created!')
-  end
+        click_button 'Create Movie'
 
-  it "does not save the movie if it's invalid" do
-    visit new_movie_url
+        expect(current_path).to eq(movie_path(Movie.last))
 
-    expect { 
-        click_button 'Create Movie' 
-    }.not_to change(Movie, :count)
+        expect(page).to have_text('New Movie Title')
+        expect(page).to have_text(@genre1.name)
+        expect(page).to have_text(@genre2.name)
+        expect(page).not_to have_text(@genre3.name)
 
-    expect(current_path).to eq(movies_path)   
-    expect(page).to have_text('error')
-  end
+        expect(page).to have_text('Movie was successfully created!')
+    end
+
+    it "does not save the movie if it's invalid" do
+        visit new_movie_url
+
+        expect { 
+            click_button 'Create Movie' 
+        }.not_to change(Movie, :count)
+
+        expect(current_path).to eq(movies_path)   
+        expect(page).to have_text('error')
+    end
 end
